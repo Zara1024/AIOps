@@ -6,6 +6,9 @@ import (
 
 	authHandler "github.com/Zara1024/AIOps/cloudops-server/internal/auth/handler"
 	authService "github.com/Zara1024/AIOps/cloudops-server/internal/auth/service"
+	cmdbHandler "github.com/Zara1024/AIOps/cloudops-server/internal/cmdb/handler"
+	cmdbRepo "github.com/Zara1024/AIOps/cloudops-server/internal/cmdb/repository"
+	cmdbService "github.com/Zara1024/AIOps/cloudops-server/internal/cmdb/service"
 	systemHandler "github.com/Zara1024/AIOps/cloudops-server/internal/system/handler"
 	"github.com/Zara1024/AIOps/cloudops-server/internal/system/repository"
 	systemService "github.com/Zara1024/AIOps/cloudops-server/internal/system/service"
@@ -33,13 +36,20 @@ func InitRouter(cfg *config.Config, db *gorm.DB) *gin.Engine {
 	deptRepo := repository.NewDepartmentRepository(db)
 	logRepo := repository.NewLogRepository(db)
 
+	// CMDB Repository
+	hostRepo := cmdbRepo.NewHostRepository(db)
+	groupRepo := cmdbRepo.NewHostGroupRepository(db)
+	sshRecordRepo := cmdbRepo.NewSSHRecordRepository(db)
+
 	// 初始化 Service
 	authSvc := authService.NewAuthService(userRepo, logRepo, &cfg.JWT)
 	sysSvc := systemService.NewSystemService(userRepo, roleRepo, menuRepo, deptRepo, logRepo)
+	cmdbSvc := cmdbService.NewCMDBService(hostRepo, groupRepo, sshRecordRepo)
 
 	// 初始化 Handler
 	authH := authHandler.NewAuthHandler(authSvc)
 	sysH := systemHandler.NewSystemHandler(sysSvc)
+	cmdbH := cmdbHandler.NewCMDBHandler(cmdbSvc)
 
 	// API 路由组
 	api := r.Group("/api/v1")
@@ -98,6 +108,28 @@ func InitRouter(cfg *config.Config, db *gorm.DB) *gin.Engine {
 				system.POST("/departments", sysH.CreateDept)
 				system.PUT("/departments/:id", sysH.UpdateDept)
 				system.DELETE("/departments/:id", sysH.DeleteDept)
+			}
+
+			// CMDB 资产管理
+			cmdb := authorized.Group("/cmdb")
+			{
+				// 主机管理
+				cmdb.GET("/hosts", cmdbH.ListHosts)
+				cmdb.GET("/hosts/:id", cmdbH.GetHost)
+				cmdb.POST("/hosts", cmdbH.CreateHost)
+				cmdb.PUT("/hosts/:id", cmdbH.UpdateHost)
+				cmdb.DELETE("/hosts/:id", cmdbH.DeleteHost)
+				cmdb.POST("/hosts/batch-delete", cmdbH.BatchDeleteHosts)
+				cmdb.POST("/hosts/batch-group", cmdbH.BatchUpdateGroup)
+
+				// 主机分组
+				cmdb.GET("/groups", cmdbH.GetGroupTree)
+				cmdb.POST("/groups", cmdbH.CreateGroup)
+				cmdb.PUT("/groups/:id", cmdbH.UpdateGroup)
+				cmdb.DELETE("/groups/:id", cmdbH.DeleteGroup)
+
+				// SSH 操作记录
+				cmdb.GET("/ssh-records", cmdbH.ListSSHRecords)
 			}
 		}
 	}

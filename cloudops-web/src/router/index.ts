@@ -51,6 +51,19 @@ const constantRoutes: RouteRecordRaw[] = [
                 component: () => import('@/views/system/departments/index.vue'),
                 meta: { title: '部门管理', icon: 'OfficeBuilding' },
             },
+            // CMDB 资产管理
+            {
+                path: 'cmdb/hosts',
+                name: 'CMDBHosts',
+                component: () => import('@/views/cmdb/hosts/index.vue'),
+                meta: { title: '主机管理', icon: 'Monitor' },
+            },
+            {
+                path: 'cmdb/groups',
+                name: 'CMDBGroups',
+                component: () => import('@/views/cmdb/groups/index.vue'),
+                meta: { title: '主机分组', icon: 'FolderOpened' },
+            },
         ],
     },
     {

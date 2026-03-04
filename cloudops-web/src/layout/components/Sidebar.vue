@@ -26,6 +26,15 @@ const menuList = [
       { path: '/system/departments', title: '部门管理', icon: 'OfficeBuilding' },
     ],
   },
+  {
+    path: '/cmdb',
+    title: 'CMDB资产',
+    icon: 'Coin',
+    children: [
+      { path: '/cmdb/hosts', title: '主机管理', icon: 'Monitor' },
+      { path: '/cmdb/groups', title: '主机分组', icon: 'FolderOpened' },
+    ],
+  },
 ]
 
 const activePath = computed(() => route.path)

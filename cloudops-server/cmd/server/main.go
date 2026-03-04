@@ -13,8 +13,9 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/Zara1024/AIOps/cloudops-server/internal/cmdb/model"
 	"github.com/Zara1024/AIOps/cloudops-server/internal/router"
-	"github.com/Zara1024/AIOps/cloudops-server/internal/system/model"
+	sysModel "github.com/Zara1024/AIOps/cloudops-server/internal/system/model"
 	"github.com/Zara1024/AIOps/cloudops-server/pkg/config"
 	"github.com/Zara1024/AIOps/cloudops-server/pkg/crypto"
 	"github.com/Zara1024/AIOps/cloudops-server/pkg/database"
@@ -52,12 +53,17 @@ func main() {
 
 	// 自动迁移数据库表
 	if err := db.AutoMigrate(
-		&model.User{},
-		&model.Role{},
-		&model.Menu{},
-		&model.Department{},
-		&model.OperationLog{},
-		&model.LoginLog{},
+		// 系统管理模型
+		&sysModel.User{},
+		&sysModel.Role{},
+		&sysModel.Menu{},
+		&sysModel.Department{},
+		&sysModel.OperationLog{},
+		&sysModel.LoginLog{},
+		// CMDB 模型
+		&model.Host{},
+		&model.HostGroup{},
+		&model.SSHRecord{},
 	); err != nil {
 		slog.Error("数据库迁移失败", "error", err)
 		os.Exit(1)
@@ -118,7 +124,7 @@ func main() {
 func initSeedData(db *gorm.DB) {
 	// 检查是否已有管理员用户
 	var count int64
-	db.Model(&model.User{}).Count(&count)
+	db.Model(&sysModel.User{}).Count(&count)
 	if count > 0 {
 		return
 	}
@@ -126,7 +132,7 @@ func initSeedData(db *gorm.DB) {
 	slog.Info("初始化种子数据...")
 
 	// 创建默认角色
-	roles := []model.Role{
+	roles := []sysModel.Role{
 		{RoleName: "超级管理员", RoleKey: "super_admin", Description: "拥有所有权限", SortOrder: 1, Status: 1},
 		{RoleName: "管理员", RoleKey: "admin", Description: "管理权限", SortOrder: 2, Status: 1},
 		{RoleName: "只读用户", RoleKey: "viewer", Description: "只读权限", SortOrder: 3, Status: 1},
@@ -136,7 +142,7 @@ func initSeedData(db *gorm.DB) {
 	}
 
 	// 创建默认菜单
-	menus := []model.Menu{
+	menus := []sysModel.Menu{
 		// 仪表盘
 		{ParentID: 0, MenuName: "仪表盘", MenuType: 2, Path: "/dashboard", Component: "views/dashboard/index", Icon: "Monitor", Permission: "", SortOrder: 1, Visible: true, Status: 1},
 		// 系统管理 (目录)
@@ -148,7 +154,7 @@ func initSeedData(db *gorm.DB) {
 
 	// 系统管理子菜单
 	parentID := menus[1].ID
-	subMenus := []model.Menu{
+	subMenus := []sysModel.Menu{
 		{ParentID: parentID, MenuName: "用户管理", MenuType: 2, Path: "/system/users", Component: "views/system/users/index", Icon: "User", Permission: "system:user:list", SortOrder: 1, Visible: true, Status: 1},
 		{ParentID: parentID, MenuName: "角色管理", MenuType: 2, Path: "/system/roles", Component: "views/system/roles/index", Icon: "UserFilled", Permission: "system:role:list", SortOrder: 2, Visible: true, Status: 1},
 		{ParentID: parentID, MenuName: "菜单管理", MenuType: 2, Path: "/system/menus", Component: "views/system/menus/index", Icon: "Menu", Permission: "system:menu:list", SortOrder: 3, Visible: true, Status: 1},
@@ -172,7 +178,7 @@ func initSeedData(db *gorm.DB) {
 		case "部门管理":
 			module = "system:dept"
 		}
-		buttons := []model.Menu{
+		buttons := []sysModel.Menu{
 			{ParentID: sm.ID, MenuName: "新增", MenuType: 3, Permission: module + ":create", SortOrder: 1, Status: 1},
 			{ParentID: sm.ID, MenuName: "编辑", MenuType: 3, Permission: module + ":update", SortOrder: 2, Status: 1},
 			{ParentID: sm.ID, MenuName: "删除", MenuType: 3, Permission: module + ":delete", SortOrder: 3, Status: 1},
@@ -183,14 +189,14 @@ func initSeedData(db *gorm.DB) {
 	}
 
 	// 为超级管理员角色分配所有菜单
-	var allMenus []model.Menu
+	var allMenus []sysModel.Menu
 	db.Find(&allMenus)
 	superAdminRole := roles[0]
 	db.Model(&superAdminRole).Association("Menus").Replace(allMenus)
 
 	// 创建默认管理员用户
 	hash, _ := crypto.HashPassword("Admin@2026")
-	admin := &model.User{
+	admin := &sysModel.User{
 		Username:     "admin",
 		PasswordHash: hash,
 		Nickname:     "超级管理员",
@@ -200,7 +206,7 @@ func initSeedData(db *gorm.DB) {
 	db.Create(admin)
 
 	// 为管理员用户分配超级管理员角色
-	db.Model(admin).Association("Roles").Replace([]model.Role{superAdminRole})
+	db.Model(admin).Association("Roles").Replace([]sysModel.Role{superAdminRole})
 
 	slog.Info("种子数据初始化完成",
 		"admin_user", "admin",
