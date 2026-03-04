@@ -1,5 +1,32 @@
 import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import 'element-plus/theme-chalk/dark/css-vars.css'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 
-createApp(App).mount('#app')
+import App from './App.vue'
+import router from './router'
+import './styles/index.css'
+
+const app = createApp(App)
+
+// Pinia 状态管理
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+app.use(pinia)
+
+// Element Plus
+app.use(ElementPlus, { locale: zhCn, size: 'default' })
+
+// 注册所有 Element Plus 图标
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+
+// 路由
+app.use(router)
+
+app.mount('#app')

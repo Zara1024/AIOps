@@ -1,0 +1,197 @@
+/* ============================================
+   智维云枢 - 深空科技风全局样式
+   ============================================ */
+
+:root {
+  /* 主色调 */
+  --co-primary: #667eea;
+  --co-primary-light: #7c93f5;
+  --co-primary-dark: #4c5fd5;
+  --co-accent: #764ba2;
+  --co-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  /* 背景色 */
+  --co-bg-deep: #0a0e27;
+  --co-bg-dark: #111631;
+  --co-bg-card: rgba(17, 22, 49, 0.85);
+  --co-bg-sidebar: rgba(10, 14, 39, 0.95);
+  --co-bg-header: rgba(17, 22, 49, 0.9);
+
+  /* 文本色 */
+  --co-text-primary: #e4e6f0;
+  --co-text-secondary: #a0a4b8;
+  --co-text-muted: #6b6f82;
+
+  /* 边框 */
+  --co-border: rgba(102, 126, 234, 0.15);
+  --co-border-light: rgba(102, 126, 234, 0.08);
+
+  /* 阴影 */
+  --co-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --co-shadow-card: 0 8px 32px rgba(0, 0, 0, 0.2);
+  --co-glow: 0 0 20px rgba(102, 126, 234, 0.15);
+
+  /* 圆角 */
+  --co-radius: 12px;
+  --co-radius-sm: 8px;
+  --co-radius-lg: 16px;
+
+  /* 过渡 */
+  --co-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* 布局 */
+  --co-sidebar-width: 220px;
+  --co-sidebar-collapsed: 64px;
+  --co-header-height: 56px;
+  --co-tabs-height: 40px;
+}
+
+/* 全局重置 */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--co-bg-deep);
+  color: var(--co-text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.5);
+}
+
+/* 链接 */
+a {
+  color: var(--co-primary);
+  text-decoration: none;
+  transition: var(--co-transition);
+}
+
+a:hover {
+  color: var(--co-primary-light);
+}
+
+/* Element Plus 暗色主题覆盖 */
+.el-menu {
+  border-right: none !important;
+}
+
+.el-card {
+  background: var(--co-bg-card) !important;
+  border: 1px solid var(--co-border) !important;
+  border-radius: var(--co-radius) !important;
+  backdrop-filter: blur(20px);
+}
+
+.el-table {
+  --el-table-bg-color: transparent !important;
+  --el-table-header-bg-color: rgba(102, 126, 234, 0.08) !important;
+  --el-table-tr-bg-color: transparent !important;
+  --el-table-row-hover-bg-color: rgba(102, 126, 234, 0.06) !important;
+  --el-table-border-color: var(--co-border) !important;
+  --el-table-text-color: var(--co-text-primary) !important;
+  --el-table-header-text-color: var(--co-text-secondary) !important;
+}
+
+.el-button--primary {
+  background: var(--co-gradient) !important;
+  border: none !important;
+}
+
+.el-button--primary:hover {
+  opacity: 0.9;
+}
+
+.el-dialog {
+  background: var(--co-bg-dark) !important;
+  border: 1px solid var(--co-border) !important;
+  border-radius: var(--co-radius-lg) !important;
+}
+
+.el-input__wrapper {
+  background: rgba(17, 22, 49, 0.6) !important;
+  border: 1px solid var(--co-border) !important;
+  box-shadow: none !important;
+}
+
+.el-input__wrapper:hover,
+.el-input__wrapper.is-focus {
+  border-color: var(--co-primary) !important;
+  box-shadow: var(--co-glow) !important;
+}
+
+.el-pagination {
+  --el-pagination-bg-color: transparent !important;
+  --el-pagination-button-bg-color: rgba(102, 126, 234, 0.1) !important;
+  --el-pagination-hover-color: var(--co-primary) !important;
+}
+
+/* 毛玻璃卡片 */
+.glass-card {
+  background: var(--co-bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--co-border);
+  border-radius: var(--co-radius);
+  box-shadow: var(--co-shadow-card);
+  transition: var(--co-transition);
+}
+
+.glass-card:hover {
+  border-color: rgba(102, 126, 234, 0.3);
+  box-shadow: var(--co-glow);
+  transform: translateY(-2px);
+}
+
+/* 渐变文字 */
+.gradient-text {
+  background: var(--co-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(102, 126, 234, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(102, 126, 234, 0.4); }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
